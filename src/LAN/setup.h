@@ -17,6 +17,6 @@ struct broadcast_param {
 // and responds with its own ip
 void initiateNewUser(void* parameters);
 // helper function to listen for udp broadcast from new user
-void recieveBroadcast(const int PORT_NUMBER, long* recieved_ip);
+void receiveBroadcast(const int PORT_NUMBER, long* recieved_ip);
 // helper function to notify specified ip address that there is a user already in the chat
 void notify_IP(long ip_address, const int PORT_NUMBER);

@@ -1,6 +1,7 @@
 #include <WinSock2.h>
 #include <stdio.h>
 #include <ws2ipdef.h>
+#include <Ws2tcpip.h>
 #include "setup.h"
 
 /*
@@ -147,7 +148,7 @@ void notify_IP(long ip_address, const int PORT_NUMBER)
     closesocket(sock);
 }
 
-void recieveBroadcast(const int PORT_NUMBER, long* recieved_ip)
+void receiveBroadcast(const int PORT_NUMBER, long* recieved_ip)
 {
     SOCKET sock;
     // creates udp socket for broadcasting
@@ -176,7 +177,7 @@ void recieveBroadcast(const int PORT_NUMBER, long* recieved_ip)
     struct ip_mreq mreq;
     mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
     mreq.imr_interface.s_addr = 0;
-    setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+    setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&mreq, sizeof(mreq));
 
     struct sockaddr_in peer_ip_address;
     int peer_ip_len = sizeof(struct sockaddr);
@@ -199,6 +200,6 @@ void initiateNewUser(void* parameters)
     const int PORT_NUMBER = b->port;
     long recieved_ip = b->recieved_ip;
 
-    recieveBroadcast(PORT_NUMBER, &recieved_ip);
+    receiveBroadcast(PORT_NUMBER, &recieved_ip);
     notify_IP(recieved_ip, PORT_NUMBER);
 }
