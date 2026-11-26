@@ -14,13 +14,13 @@ void broadcastTest(void)
 {
     int choice;
     long broadcast_ip = 0;
-    printf("send broadcast (0) or recieve broadcast (1) ?\n");
+    printf("send broadcast (0) or receive broadcast (1) ?\n");
     scanf("%d", &choice);
     if (choice)
     {
-        recieveBroadcast(PORT_NUMBER, &broadcast_ip);
+        receiveBroadcast(PORT_NUMBER, &broadcast_ip);
         if (broadcast_ip != 0)
-            printf("recieved ip address: %d\n", broadcast_ip);
+            printf("received ip address: %d\n", broadcast_ip);
     }
     else 
         broadcastIP(PORT_NUMBER);

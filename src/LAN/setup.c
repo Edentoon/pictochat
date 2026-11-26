@@ -1,5 +1,6 @@
 #include <WinSock2.h>
 #include <stdio.h>
+#include <ws2ipdef.h>
 #include "setup.h"
 
 /*
@@ -73,6 +74,7 @@ int setup_link_socket(const int PORT_NUMBER, struct sockaddr_in *calling_user,
         printf("communication socket could not be created. error no: %d\n", WSAGetLastError());
         return 1;
     }
+    closesocket(sock);
     return 0;
 
 }
@@ -102,7 +104,7 @@ void broadcastIP(const int PORT_NUMBER)
     // broadcast addr struct setup
     struct sockaddr_in broadcast_info;
     broadcast_info.sin_family = AF_INET;
-    broadcast_info.sin_addr.s_addr = INADDR_BROADCAST;
+    broadcast_info.sin_addr.s_addr = inet_addr("239.255.255.250");
     broadcast_info.sin_port = htons(PORT_NUMBER);
 
     const char* message = "IP ADDRESS BROADCAST";
@@ -114,6 +116,7 @@ void broadcastIP(const int PORT_NUMBER)
         printf("sendto error\n");
         return;
     }
+    closesocket(sock);
 }
 
 void notify_IP(long ip_address, const int PORT_NUMBER)
@@ -141,7 +144,7 @@ void notify_IP(long ip_address, const int PORT_NUMBER)
     {
         sendto(sock, message, message_len, 0, (struct sockaddr *)&notify_info, sizeof(notify_info));
     }
-    
+    closesocket(sock);
 }
 
 void recieveBroadcast(const int PORT_NUMBER, long* recieved_ip)
@@ -162,14 +165,6 @@ void recieveBroadcast(const int PORT_NUMBER, long* recieved_ip)
     local_info.sin_addr.s_addr = 0;
     local_info.sin_port = htons(PORT_NUMBER);
 
-    // set socket options to allow broadcast and disable loopback
-    int broadcast_opt = 1;
-    int opt_error = setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (void *)&broadcast_opt, sizeof(broadcast_opt));
-    if (opt_error < 0)
-    {
-        printf("setsockopt failed, error: %d\n", WSAGetLastError());
-        return;
-    }
 
     int bind_error = bind(sock, (struct sockaddr *)&local_info, sizeof(local_info));
     if (bind_error != 0)
@@ -178,10 +173,16 @@ void recieveBroadcast(const int PORT_NUMBER, long* recieved_ip)
         return;
     }
 
+    struct ip_mreq mreq;
+    mreq.imr_multiaddr.s_addr = inet_addr("239.255.255.250");
+    mreq.imr_interface.s_addr = 0;
+    setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+
     struct sockaddr_in peer_ip_address;
     int peer_ip_len = sizeof(struct sockaddr);
     char recieved_message[60];
     int recv_error = recvfrom(sock, recieved_message, 60, 0, (struct sockaddr *)&peer_ip_address, &peer_ip_len);
+
     if (recv_error == SOCKET_ERROR)
     {
         printf("recvfrom error: %d\n", WSAGetLastError());
@@ -189,6 +190,7 @@ void recieveBroadcast(const int PORT_NUMBER, long* recieved_ip)
     }
     
     *recieved_ip = peer_ip_address.sin_addr.s_addr;
+    closesocket(sock);
 }
 void initiateNewUser(void* parameters)
 {
