@@ -148,7 +148,7 @@ void notify_IP(long ip_address, const int PORT_NUMBER)
     closesocket(sock);
 }
 
-void receiveBroadcast(const int PORT_NUMBER, long* recieved_ip)
+void receiveBroadcast(const int PORT_NUMBER, u_long* recieved_ip)
 {
     SOCKET sock;
     // creates udp socket for broadcasting

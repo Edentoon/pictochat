@@ -13,14 +13,14 @@ void socketSetupTest(void)
 void broadcastTest(void)
 {
     int choice;
-    long broadcast_ip = 0;
+    u_long broadcast_ip = 0;
     printf("send broadcast (0) or receive broadcast (1) ?\n");
     scanf("%d", &choice);
     if (choice)
     {
         receiveBroadcast(PORT_NUMBER, &broadcast_ip);
         if (broadcast_ip != 0)
-            printf("received ip address: %d\n", broadcast_ip);
+            printf("received ip address: %lu\n", broadcast_ip);
     }
     else 
         broadcastIP(PORT_NUMBER);
