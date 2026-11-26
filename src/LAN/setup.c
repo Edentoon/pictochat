@@ -195,8 +195,8 @@ void initiateNewUser(void* parameters)
     // casting back to original data
     struct broadcast_param *b = (struct broadcast_param*)parameters;
     const int PORT_NUMBER = b->port;
-    long* recieved_ip = b->recieved_ip;
+    long recieved_ip = b->recieved_ip;
 
-    recieveBroadcast(PORT_NUMBER, recieved_ip);
-    notify_IP(*recieved_ip, PORT_NUMBER);
+    recieveBroadcast(PORT_NUMBER, &recieved_ip);
+    notify_IP(recieved_ip, PORT_NUMBER);
 }
